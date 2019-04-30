@@ -1,12 +1,12 @@
 const createServer = require('../server-blox');
-const createTicker = require('../server-blox/ticker');
+const createTickGenerator = require('../server-blox/tick-generator');
 
-const usdGbpTicker = createTicker({
+const usdGbpTicker = createTickGenerator({
   name: 'Example Ticker USDGBP',
   onTick: async val => console.log({ ...val, symbol: 'USDGBP' })
 });
 
-const eurGbpTicker = createTicker({
+const eurGbpTicker = createTickGenerator({
   name: 'Example Ticker EURGBP',
   initialValue: 10,
   onTick: async val => console.log({ ...val, symbol: 'EURGBP' })

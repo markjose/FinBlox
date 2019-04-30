@@ -34,7 +34,7 @@ module.exports = ({
     if (!block.name) {
       throw new Error(`This block does not expose a property named 'name'`);
     }
-    console.log(`Adding block '${block.name}' to server`);
+    console.log(`Adding block '${block.name}' to server '${name}`);
   };
 
   const run = async () => {

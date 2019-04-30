@@ -2,7 +2,7 @@ const { DateTime } = require('luxon');
 
 module.exports = options => {
   const {
-    name = 'New OHLC Block', // The name of the block
+    name = 'New OHLC Aggregator', // The name of the block
     unit = 'hours', // The unit which the period is specified in
     period = 1, // The aggregation period in 'unit' units for ticks
     onOpen = () => null,
@@ -52,6 +52,6 @@ module.exports = options => {
     ohlcs[key] = updateOhlc(ohlcs[key], value);
   };
 
-  console.log(`Created ohlc '${name}'`);
+  console.log(`Created ohlc-aggregator '${name}'`);
   return { name, tick };
 };

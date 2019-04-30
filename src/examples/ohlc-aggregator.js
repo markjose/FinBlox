@@ -1,16 +1,16 @@
 const createServer = require('../server-blox');
-const createTicker = require('../server-blox/ticker');
-const createOhlc = require('../server-blox/ohlc');
+const createTickGenerator = require('../server-blox/tick-generator');
+const createOhlcAggregator = require('../server-blox/ohlc-aggregator');
 
-const oneMinuteOhlc = createOhlc({
+const oneMinuteOhlc = createOhlcAggregator({
   name: 'Example OHLC One Minute',
-  unit: 'minutes',
-  period: 1,
+  unit: 'seconds',
+  period: 5,
   onOpen: async ohlc => console.log('OPEN', ohlc),
   onClose: async ohlc => console.log('CLOSE', ohlc)
 })
 
-const eurGbpTicker = createTicker({
+const eurGbpTicker = createTickGenerator({
   name: 'Example Ticker EURGBP',
   initialValue: 1,
   onTick: async val => await oneMinuteOhlc.tick('EURGBP', val)

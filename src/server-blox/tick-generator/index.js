@@ -53,10 +53,10 @@ function* tickGenerator(options) {
 }
 
 module.exports = options => {
-  const { name = 'New Ticker Block' } = options;
+  const { name = 'New Tick Generator' } = options;
   const generator = tickGenerator(options);
 
-  console.log(`Created ticker '${name}'`);
+  console.log(`Created tick-generator '${name}'`);
   return {
     name,
     execute: opCount => generator.next(opCount)
