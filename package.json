@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "luxon": "^1.12.1"
+    "luxon": "^1.12.1",
+    "random": "^2.1.1"
   }
 }

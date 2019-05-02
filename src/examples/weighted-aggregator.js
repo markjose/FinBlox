@@ -15,19 +15,28 @@ const weightedAggregator = createWeightedAggregator({
 const tickerSource1 = createTickGenerator({
   name: 'Example Ticker Source 1',
   initialValue: 1,
-  onTick: async val => await weightedAggregator.tick('SYMBOL', val, 'source-name-1')
+  onTick: async ({ time, ask, bid }) => {
+    await weightedAggregator.tick('SYMBOL_ask', { time, value: ask }, 'source-name-1');
+    await weightedAggregator.tick('SYMBOL_bid', { time, value: bid }, 'source-name-1');
+  }
 });
 
 const tickerSource2 = createTickGenerator({
   name: 'Example Ticker Source 2',
   initialValue: 1,
-  onTick: async val => await weightedAggregator.tick('SYMBOL', val, 'source-name-2')
+  onTick: async ({ time, ask, bid }) => {
+    await weightedAggregator.tick('SYMBOL_ask', { time, value: ask }, 'source-name-2');
+    await weightedAggregator.tick('SYMBOL_bid', { time, value: bid }, 'source-name-2');
+  }
 });
 
 const tickerSource3 = createTickGenerator({
   name: 'Example Ticker Source 3',
   initialValue: 2,
-  onTick: async val => await weightedAggregator.tick('SYMBOL', val, 'source-name-3')
+  onTick: async ({ time, ask, bid }) => {
+    await weightedAggregator.tick('SYMBOL_ask', { time, value: ask }, 'source-name-3');
+    await weightedAggregator.tick('SYMBOL_bid', { time, value: bid }, 'source-name-3');
+  }
 });
 
 const exampleServer = createServer({

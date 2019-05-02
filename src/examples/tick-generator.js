@@ -9,6 +9,7 @@ const usdGbpTicker = createTickGenerator({
 const eurGbpTicker = createTickGenerator({
   name: 'Example Ticker EURGBP',
   initialValue: 10,
+  useLinearDistribution: true,
   onTick: async val => console.log({ ...val, symbol: 'EURGBP' })
 });
 
@@ -17,5 +18,5 @@ const exampleServer = createServer({
 });
 
 exampleServer.add(usdGbpTicker);
-exampleServer.add(eurGbpTicker);
+//exampleServer.add(eurGbpTicker);
 exampleServer.run();
