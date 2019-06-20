@@ -1,5 +1,8 @@
 const random = require('random');
 const { DateTime } = require('luxon');
+const { getMidPrice } = require('../../utils/price');
+
+const defaultVolume = 1234;
 
 function* tickGenerator(options) {
   const {
@@ -56,10 +59,16 @@ function* tickGenerator(options) {
     currentValueTime = nextValueTime;
 
     const val = currentValue += getIncrement();
+    const ask = formatValue(val + getSpread());
+    const bid = formatValue(val);
+
     yield onTick({
       time: DateTime.utc().toISO(),
-      bid: formatValue(val),
-      ask: formatValue(val + getSpread())
+      ask,
+      bid,
+      bidVolume: defaultVolume,
+      askVolume: defaultVolume,
+      mid: getMidPrice(ask, bid)
     });
   }
 }

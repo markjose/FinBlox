@@ -1,26 +1,29 @@
 const { DateTime } = require('luxon');
 const validate = require('jsonschema').validate;
+const { getMidPrice } = require('../../utils/price');
 
 const orderSchema = require('../schema/order');
 const bookBuilder = require('./bookBuilder');
 
-const emptyBook = { bid: [], ask: [] };
-
 let nextOrderId = 1;
 
 const generateOrderId = () => nextOrderId++;
-const getMidPrice = (lower, upper) => lower && upper && (lower.price + ((upper.price - lower.price) / 2.0));
 
 module.exports = options => {
   const {
     name = 'New Order Book', // The name of the block
+    securityId,
     getOrderId = generateOrderId,
     onErrors = () => null,
-    onChanged = () => null
+    onTick = () => null
   } = options;
 
-  const orders = {};
-  const books = {};
+  if (!securityId || securityId.length < 1) return onErrors([
+    `The book requires a valid security ID (${securityId})`
+  ]);
+
+  let book;
+  const orders = [];
 
   const validateOrder = (order, onComplete = () => null) => {
     const { errors } = validate(order, orderSchema);
@@ -29,25 +32,22 @@ module.exports = options => {
   };
 
   const addOrder = order => {
-    const { securityId } = order;
+    if (order.securityId !== securityId) return onErrors([
+      `The order security ID (${order.securityId}) is not the same as the book security ID (${securityId})`
+    ]);
 
     order.orderId = getOrderId(order);
     order.created = DateTime.utc().toISO();
 
-    if (!orders[securityId]) orders[securityId] = [];
-    orders[securityId].push(order);
+    if (!orders) orders = [];
+    orders.push(order);
+    book = bookBuilder(orders);
 
-    if (!books[securityId]) books[securityId] = emptyBook;
-    books[securityId] = bookBuilder(orders[securityId]);
-
-    onChanged({
-      orders: orders[securityId],
-      books: books[securityId]
-    });
+    onTick(getBook(1));
   };
 
-  const getBook = (securityId, depth) => {
-    const { ask, bid } = books[securityId];
+  const getBook = depth => {
+    const { ask, bid, time } = book;
 
     const rows = [];
     const rowCount = Math.max(ask.length, bid.length);
@@ -55,11 +55,12 @@ module.exports = options => {
 
     for (let i = 0; i < takeRows; i++) {
       rows.push({
-        askPrice: ask[i] && ask[i].price,
+        time,
+        ask: ask[i] && ask[i].price,
         askVolume: ask[i] && ask[i].volume,
-        bidPrice: bid[i] && bid[i].price,
+        bid: bid[i] && bid[i].price,
         bidVolume: bid[i] && bid[i].volume,
-        midPrice: getMidPrice(ask[i], bid[i])
+        mid: getMidPrice(ask[i], bid[i])
       });
     }
 

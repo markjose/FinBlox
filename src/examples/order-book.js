@@ -1,6 +1,7 @@
 const createOrderBook = require('../server-blox/order-book');
 
 const exampleOrderBook = createOrderBook({
+  securityId: 'foo:bar',
   name: 'Example Order Book',
   onErrors: console.log
 });
@@ -23,5 +24,5 @@ exampleOrderBook.newOrder({
   direction: 'sell'
 });
 
-console.log(exampleOrderBook.getBook('foo:bar'));
-console.log(exampleOrderBook.getBook('foo:bar', 1));
+console.log(exampleOrderBook.getBook());
+console.log(exampleOrderBook.getBook(1));
