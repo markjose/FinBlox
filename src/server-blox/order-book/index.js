@@ -28,7 +28,7 @@ module.exports = options => {
   const validateOrder = (order, onComplete = () => null) => {
     const { errors } = validate(order, orderSchema);
 
-    onComplete(errors.length ? errors.map(({ schema, stack }) => `${schema}: ${stack}`) : null);
+    return onComplete(errors.length ? errors.map(({ schema, stack }) => `${schema}: ${stack}`) : null);
   };
 
   const addOrder = order => {
@@ -37,17 +37,45 @@ module.exports = options => {
     ]);
 
     order.orderId = getOrderId(order);
+    order.updateable = true;
     order.created = DateTime.utc().toISO();
 
     if (!orders) orders = [];
     orders.push(order);
-    book = bookBuilder(orders);
 
+    book = bookBuilder(orders);
+    onTick(getBook(1));
+
+    return order;
+  };
+
+  const updateOrder = (orderId, { size, price }) => {
+    const updateable = { size, price };
+    const now = DateTime.utc().toISO();
+
+    let order = orders.find(order => order.orderId === orderId);
+    if (!order) return onErrors([
+      `The order ID (${orderId}) was not found`
+    ]);
+
+    if (!order.updateable) return onErrors([
+      `The order ID (${orderId}) is locked and cannot be updated`
+    ]);
+
+    order.history = Object.assign(order.history || [], {
+      time: now,
+      size: { from: order.size, to: size },
+      price: { from: order.price, to: order.price }
+    });
+    order.modified = now;
+    order = Object.assign(order, updateable);
+
+    book = bookBuilder(orders);
     onTick(getBook(1));
   };
 
   const getBook = depth => {
-    const { ask, bid, time } = book;
+    const { ask, bid } = book;
 
     const rows = [];
     const rowCount = Math.max(ask.length, bid.length);
@@ -55,7 +83,6 @@ module.exports = options => {
 
     for (let i = 0; i < takeRows; i++) {
       rows.push({
-        time,
         ask: ask[i] && ask[i].price,
         askVolume: ask[i] && ask[i].volume,
         bid: bid[i] && bid[i].price,
@@ -64,12 +91,23 @@ module.exports = options => {
       });
     }
 
-    return rows;
+    return {
+      securityId,
+      time: DateTime.utc().toISO(),
+      rows
+    };
   };
 
-  const newOrder = order => validateOrder(order, errors => errors ? onErrors(errors) : addOrder(order));
-  const allOrders = () => orders;
+  const createOrder = order => validateOrder(order, errors => errors ? onErrors(errors) : addOrder(order));
+
+  const listOrders = () => orders;
 
   console.log(`Created order-book '${name}'`);
-  return { name, newOrder, allOrders, getBook };
+  return {
+    name,
+    createOrder,
+    updateOrder,
+    listOrders,
+    getBook
+  };
 };

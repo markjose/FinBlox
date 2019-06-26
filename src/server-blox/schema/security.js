@@ -3,7 +3,9 @@ module.exports = {
   type: 'object',
   properties: {
     securityId: { type: 'string' },
-    name: { type: 'string' }
+    name: { type: 'string' },
+    tickSize: { type: 'number' },
+    allowHalfTicks: { type: 'boolean' }
   },
-  required: ['securityId', 'name']
+  required: ['securityId', 'name', 'tickSize']
 };

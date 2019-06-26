@@ -5,9 +5,30 @@ const exampleSecurityMaster = createSecurityMaster({
   onErrors: console.log
 });
 
-exampleSecurityMaster.newSecurity({
-  securityId: 'foo:bar',
-  name: 'Foo Bar'
+exampleSecurityMaster.create({
+  securityId: 'bar',
+  name: 'Bar',
+  tickSize: 0.1
 });
 
-console.log(exampleSecurityMaster.listSecurities());
+exampleSecurityMaster.create({
+  securityId: 'faa:bar',
+  name: 'Faa Bar',
+  tickSize: 0.01
+});
+
+exampleSecurityMaster.create({
+  securityId: 'foo:bar',
+  name: 'Foo Bar',
+  tickSize: 0.001,
+  allowHalfTicks: true
+});
+
+exampleSecurityMaster.create({
+  securityId: 'foo:baz',
+  name: 'Foo Baz',
+  tickSize: 0.0001
+});
+
+console.log(exampleSecurityMaster.list());
+console.log(exampleSecurityMaster.search('baz'));

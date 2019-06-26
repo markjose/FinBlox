@@ -1,5 +1,3 @@
-const { DateTime } = require('luxon');
-
 const sortOrdersByPrice = descending => ({ price: priceA }, { price: priceB }) => (priceA < priceB) ^ descending;
 
 module.exports = orders => {
@@ -37,7 +35,6 @@ module.exports = orders => {
     .sort(sortOrdersByPrice(isDescending));
 
   return {
-    time: DateTime.utc().toISO(),
     ask: mapPricedOrders(sell, true),
     bid: mapPricedOrders(buy, false)
   };
